@@ -1,19 +1,21 @@
+
 const { chromium } = require("playwright");
 const { GoogleSpreadsheet } = require("google-spreadsheet");
+const fs = require("fs");
 
 const ACCOUNTS = JSON.parse(process.env.ACCOUNTS);
 const SHEET_ID = process.env.SHEET_ID;
-const CREDS = JSON.parse(process.env.GOOGLE_CREDS);
+const CREDS = JSON.parse(fs.readFileSync("/etc/secrets/credentials.json", "utf8")); // Wenn du Secret File nutzt
 
 async function logToSheet(account, points) {
   const doc = new GoogleSpreadsheet(SHEET_ID);
   await doc.useServiceAccountAuth(CREDS);
   await doc.loadInfo();
-  const sheet = doc.sheetsByTitle['Einnahme'];
+  const sheet = doc.sheetsByTitle["Einnahme"];
   await sheet.addRow({
     Zeit: new Date().toLocaleString("de-DE", { timeZone: "Europe/Berlin" }),
     Account: account,
-    Punkte: points
+    Punkte: points,
   });
 }
 
@@ -34,10 +36,9 @@ async function runBot(account) {
     await page.goto("https://firefaucet.win/dashboard");
     await page.waitForTimeout(2000);
 
-    const balance = await page.$eval(".wallet-balance", el => el.textContent.trim());
+    const balance = await page.$eval(".wallet .balance", el => el.textContent.trim());
     console.log(`[${account.username}] ✅ ${balance}`);
     await logToSheet(account.username, balance);
-
   } catch (e) {
     console.log(`[${account.username}] ❌ Fehler: ${e.message}`);
   } finally {
@@ -48,6 +49,5 @@ async function runBot(account) {
 (async () => {
   for (const acc of ACCOUNTS) {
     await runBot(acc);
-    await new Promise(r => setTimeout(r, 5000)); // 5 Sekunden Pause
   }
 })();
