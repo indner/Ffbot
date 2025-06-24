@@ -1,0 +1,12 @@
+{
+  "name": "firefaucet-bot",
+  "version": "1.0.0",
+  "main": "bot.js",
+  "dependencies": {
+    "playwright": "^1.43.1",
+    "google-spreadsheet": "^3.3.0"
+  },
+  "scripts": {
+    "start": "node bot.js"
+  }
+}
