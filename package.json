@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "start": "node src/bot.js",
+    "start": "node bot.js",
     "postinstall": "npx playwright install chromium"
   },
   "dependencies": {
