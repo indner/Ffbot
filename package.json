@@ -1,13 +1,13 @@
 {
   "name": "ffbot",
   "version": "1.0.0",
-  "main": "src/bot.js",
+  "main": "bot.js",
+  "type": "module",
   "scripts": {
-    "start": "node src/bot.js",
     "postinstall": "npx playwright install"
   },
   "dependencies": {
-    "google-spreadsheet": "^3.3.0",
-    "playwright": "^1.43.0"
+    "playwright": "^1.43.1",
+    "google-spreadsheet": "^3.3.0"
   }
 }
