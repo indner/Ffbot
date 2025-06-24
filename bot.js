@@ -1,21 +1,27 @@
-
 const { chromium } = require("playwright");
 const { GoogleSpreadsheet } = require("google-spreadsheet");
-const fs = require("fs");
 
-const ACCOUNTS = JSON.parse(process.env.ACCOUNTS);
 const SHEET_ID = process.env.SHEET_ID;
-const CREDS = JSON.parse(fs.readFileSync("/etc/secrets/credentials.json", "utf8")); // Wenn du Secret File nutzt
+const CREDS = require("/etc/secrets/credentials.json");
+
+const ACCOUNTS = [];
+for (let i = 1; i <= 6; i++) {
+  const username = process.env[`FIRE_USER_${i}`];
+  const password = process.env.FIRE_PASS;
+  if (username && password) {
+    ACCOUNTS.push({ username, password });
+  }
+}
 
 async function logToSheet(account, points) {
   const doc = new GoogleSpreadsheet(SHEET_ID);
   await doc.useServiceAccountAuth(CREDS);
   await doc.loadInfo();
-  const sheet = doc.sheetsByTitle["Einnahme"];
+  const sheet = doc.sheetsByTitle['Einnahmen'];
   await sheet.addRow({
-    Zeit: new Date().toLocaleString("de-DE", { timeZone: "Europe/Berlin" }),
+    Zeit: new Date().toLocaleString("de-DE"),
     Account: account,
-    Punkte: points,
+    Punkte: points
   });
 }
 
@@ -23,7 +29,7 @@ async function runBot(account) {
   const browser = await chromium.launch({ headless: true });
   const page = await browser.newPage();
   try {
-    await page.goto("https://firefaucet.win/login");
+    await page.goto("https://firefaucet.win/login.php");
 
     await page.fill('input[name="username"]', account.username);
     await page.fill('input[name="password"]', account.password);
@@ -33,14 +39,14 @@ async function runBot(account) {
     const loggedIn = await page.$('text=Dashboard');
     if (!loggedIn) throw new Error("Login fehlgeschlagen");
 
-    await page.goto("https://firefaucet.win/dashboard");
+    await page.goto("https://firefaucet.win/dashboard.php");
     await page.waitForTimeout(2000);
 
-    const balance = await page.$eval(".wallet .balance", el => el.textContent.trim());
+    const balance = await page.$eval(".wallet-bal", el => el.innerText.trim());
     console.log(`[${account.username}] ✅ ${balance}`);
     await logToSheet(account.username, balance);
   } catch (e) {
-    console.log(`[${account.username}] ❌ Fehler: ${e.message}`);
+    console.log(`[${account.username}] ❌`, e.message);
   } finally {
     await browser.close();
   }
