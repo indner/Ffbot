@@ -2,10 +2,10 @@
   "name": "playwright-bot",
   "version": "1.0.0",
   "description": "Bot mit Playwright und Google Sheets",
-  "main": "src/bot.js",
+  "main": "bot.js",
   "scripts": {
     "postinstall": "npx playwright install chromium",
-    "start": "node src/bot.js"
+    "start": "node bot.js"
   },
   "dependencies": {
     "playwright": "^1.43.0",
