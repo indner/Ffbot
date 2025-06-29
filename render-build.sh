@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
 npm install
-npx playwright install --with deps
+npx playwright install
 npm start
