@@ -1,7 +1,7 @@
 import { chromium } from "playwright";
 import { GoogleSpreadsheet } from "google-spreadsheet";
 
-// 📦 Hole Umgebungsvariablen
+// Umgebungsvariablen
 const creds = JSON.parse(process.env.GOOGLE_CREDENTIALS_JSON || "{}");
 const sheetId = process.env.SHEET_ID || "";
 const accountsRaw = process.env.ACCOUNTS_JSON || "[]";
@@ -14,7 +14,7 @@ try {
   process.exit(1);
 }
 
-// 📄 Funktion zum Eintragen in Google Sheet
+// Logging in Google Sheet
 async function logToSheet(account, points) {
   const doc = new GoogleSpreadsheet(sheetId);
   await doc.useServiceAccountAuth(creds);
@@ -23,11 +23,11 @@ async function logToSheet(account, points) {
   await sheet.addRow({
     Zeit: new Date().toLocaleString("de-DE"),
     Account: account,
-    Punkte: points
+    Punkte: points,
   });
 }
 
-// 🤖 Hauptfunktion für jeden Bot
+// Hauptfunktion
 async function runBot(account) {
   const browser = await chromium.launch({ headless: true });
   const page = await browser.newPage();
@@ -39,7 +39,7 @@ async function runBot(account) {
     await page.click('button[type="submit"]');
     await page.waitForTimeout(3000);
 
-    const dashboard = await page.$('text=Dashboard');
+    const dashboard = await page.$("text=Dashboard");
     if (!dashboard) throw new Error("Login fehlgeschlagen");
 
     await page.goto("https://firefaucet.win/dashboard");
@@ -56,7 +56,9 @@ async function runBot(account) {
   }
 }
 
-// ▶️ Starte alle Bots
-for (const acc of accounts) {
-  runBot(acc);
-}
+// Alle Bots starten
+(async () => {
+  for (const acc of accounts) {
+    await runBot(acc);
+  }
+})();
