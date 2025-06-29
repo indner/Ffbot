@@ -1,11 +1,10 @@
 {
-  "type": "module",
   "name": "playwright-bot",
   "version": "1.0.0",
-  "description": "Bot mit Playwright und Google Sheets",
+  "description": "FireFaucet Bot mit Playwright und Google Sheets",
   "main": "src/bot.js",
   "scripts": {
-    "postinstall": "npx playwright install --with-deps",
+    "postinstall": "npx playwright install chromium",
     "start": "node src/bot.js"
   },
   "dependencies": {
@@ -14,5 +13,6 @@
   },
   "engines": {
     "node": ">=16.0.0"
-  }
+  },
+  "type": "module"
 }
