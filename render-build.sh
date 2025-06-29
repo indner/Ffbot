@@ -1,2 +1,3 @@
-#!/usr/bin/env bash
+#!/bin/bash
+npm install
 npx playwright install chromium
